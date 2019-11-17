@@ -1,0 +1,14 @@
+{
+  "name": "dans-70-483",
+  "version": "1.0.0",
+  "description": "## Starting",
+  "main": "index.js",
+  "scripts": {
+    "view": "markserv ./readme.md"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "markserv": "^1.17.2"
+  }
+}
