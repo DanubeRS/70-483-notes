@@ -1,0 +1,149 @@
+# Skill 1.4 - Create and Implement Events and Callbacks
+Early programs flowed from beginning to end.
+Modern applications, paticularly large ones, have large amounts of interoperating components
+
+## Event Handlers
+Before `async` and `await` events were the way to manage async operations
+Bound methods to completion triggers, aka _events_
+*Publish* and *subscribe* where subscriber only has to know about the mechanism of subscription
+
+### Delegates and Events
+Reference to another method in a class
+
+### Action Delegate
+`Action` is a method reference with no args, and no result
+
+### Event Subscribers
+`+=` is overloaded and used to apply delegate to an event behaviour
+Delegates added to published event are called on the same thread
+If delegate blocks, the publish is blocked
+
+`GetInvocationList` provides output of all subscribers
+
+`EventRaised?.Invoke()`
+
+### Unsubscribing from a delegate
+`-=` used to unsubscribe
+If subscriber is added to same publisher multiple times, it will be invoked _n_ times
+
+### Using Events
+Delegates can be interfered with by external usages. `event` construction implemented as a data field, rather than property
+
+`public event Action OnEventRaised = delegate {}`
+
+### Create events with built-in delegate types
+Events should use `EventHandler` rather than `Action`
+This is a part of the .Net pub/sub workflow
+
+`EventHandler` can deliver data, or just signal
+
+Accepts 2 arguments;
+1. Reference to raiser (i.e: `this`)
+2. Reference to `EventArgs` object which provides event information
+
+### Using `EventArgs` to deliver information
+i.e:
+
+```c#
+class MyEventArgs : EventArgs {
+	public string Property { get; set; }
+	
+	public MyEventArgs(string property)
+	{
+		Property = property;
+	}
+}
+```
+
+Now have own type that can describe the event
+
+Define handler as;
+
+`public event EventHandler<MyEventArgs> OnMyEventRaised ...`
+
+Listen:
+
+`static void Listener(object source, AlarmEventArgs args) { ... }`
+
+### Exceptions in event subscribers
+What happens if one of the triggered handlers throw an exception?
+
+Each event handler can be called, the subsequently any exceptions are aggregated
+
+```c#
+var exceptions = new List<Exception>();
+
+foreach (Delegate handler in OnMyEventRaised.GetInvocationList())
+{
+	try
+	{
+		handler.DynamicInvoke(this, new MyEventArgs(...);
+	} 
+	catch (TargetInvocationException e) 
+	{
+		exceptions.Add(e);
+	}
+}
+
+if (exceptions.Any())
+{
+	throw new AggregateException(exceptions);
+}
+```
+
+### Create Delegates
+DIY Delegates
+
+Declared using `delegate` keyword
+
+i.e:
+`delegate int IntOperation(int a, int b);1
+
+can be used the same as any other variable
+
+### `Delegate` vs `delegate`
+
+`delegate` is a keyword used to create delegate type in compilation
+
+`Delegate` is an abstract class used to define the created base types
+
+i.e:
+`delegate int IntOperation(...)` will create a type `IntOperation` which implements `Delegate`
+
+### Use lambda expressions (anonymous methods)
+Delegates are verbose, and hard to use
+
+Lambdas are more expressive, pure way of doing the same thing
+
+i.e:
+`delegate int IntOperation(int a, int b)`
+
+as
+
+`IntOperation op = (a, b) => a + b;`
+
+Can accept multiple inputs, and execute multiple statements
+
+### Closures
+Lambda code can access parts of the code around it, which must be available during execution
+
+The compiler makes sure that it is available for use when the delegate is invoked. Extending of lifetime is called *closure*
+
+### Built-in types for use with lambdas
+Instead of creating delegate every time;
+`delegate int IntOperation(...)`
+
+we can use a built-in type;
+
+`Func<int, int, int> add = (a, b) = a + b`
+
+`Func<T>` and its extensions always return `T`
+`Action` does not (i.e: `Action<int, int>` takes 2 numbers, and produces no output`
+Also can use `Predicate<TInput>` which always produces a `bool` value (`true` or `false`)
+
+### Anonymous methods
+Lambdas can also be used directly in the context they are needed without declaration
+
+i.e:
+`Task.Run(() => ...);`
+these are *anonymous methods*
