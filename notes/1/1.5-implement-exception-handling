@@ -1,0 +1,95 @@
+# Skill 1.5 - Implement Exception Handling
+
+Handling errors is a natrual consequence of writing programs.
+Exceptions (as implied) are errors that happen in exceptional circumstances
+Do not use to manage program flow (user input parsing etc) rather when meaningful stop to execution is required
+
+## Exception types
+`throw` exception object which can be caught using _exception handler_
+Handler mitigates effect of exception
+Might include;
+- Log
+- User alert
+- Shutting down in a managed way
+- Release resources
+
+If not handled in user code, exception is caught by .Net environment, and terminates the program in an error state
+
+Can be nested. Closest exception handler is found in stack. This is expensive, and discouraged for standard errors
+
+Specific types can be used from base `Exception` class
+
+## `try`-`catch` construction
+Handling done by putting code in _protected_ block following `try` keyword
+Handler runs in event of exception being thrown
+
+Can also use exception object in `catch (Exception ex)` filtering by type
+
+## Using the base class of an exception
+
+Order of catch filtering important. They do not cascade. Most abstract goes last
+
+## Implement `try`-`catch`-`finally`
+`finally` executes code irrespective of whether exception thrown (handled or not) or not
+Guaranteed to run, even with return
+But;
+- Not if infinite loop encountered
+- Usage of `Environment.FailFast()` in try block to ignore any finally elements
+
+## Throwing exceptions
+
+Create and throw its own exceptions
+Use `throw` to trigger an exception instance
+
+`throw new Exception(...)`
+
+## Rethrowing exception
+
+Catching exception should not hide errors from other parts
+Exception may be "passed up"
+`throw;` is used to do this
+
+Beware, that throwing initial exception (`throw ex;`) does not preserve stack trace
+This is considered bad practice
+
+## Inner exceptions
+
+Can throw new exception using previous as "inner" reference.
+Useful for bundling to more generic throws
+
+## Creating custom exceptions
+
+```c#
+class MyException : Exception
+{
+	/* .ctor */
+
+`	/* Other properties etc. */
+}
+```
+
+## Conditional causes in catch blocks
+```c#
+try
+{
+	// My operation that throws
+} 
+catch (MyException ex) when (ex.Property == "123abc")
+{
+	//Specific handler when the property == "123abc"
+}
+```
+
+## Handling inner exceptions
+
+Has propety `InnerException` in `Exception` base class
+
+## Handling aggregate exceptions
+
+Contain list of inner exceptions. Occurs when more than one thing can, and did fail
+
+## Exceptions as a part of managed error handling
+
+Deal with any exceptions thrown by methods, propagating if neccesary
+Throw exceptions when not useful to continue
+
