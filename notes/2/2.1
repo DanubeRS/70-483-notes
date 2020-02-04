@@ -1,0 +1,101 @@
+# Create Types
+
+## Value and Reference Types
+Value type (struct)
+Reference type (class)
+
+### Type design
+Clue is in name. Value types are enums and structs, reference is class.
+
+### Immutablility in types
+Immutable type: Instances cannot be changed
+`DateTime` is an example. Only read. Updates done by creating a new one.
+
+## Creating value types
+
+### Structures
+Structures can contain methods, data values, properties, and use constructors.
+
+- Constructor must init all members. Cannot be initialised inside the structure
+- Structure cannot have parameterless constructor. Struct can be created by calling parameterless constructor on type, which all members will be init as default
+- Struct cannot be created by extension
+- Struct instances created on strack, unless used in closures. Will be allocated in contigious memory.
+
+Struct can override `ToString` despite no inheritance, due to already implementing base type `struct`.
+
+### Enumerated Types
+Range of values. Can cast to numeric.
+
+## Creating reference types
+Class. Similar to struct, but minipulation is drastically different. 
+
+### Memory allocation
+Value types stored on stack, and is very efficient. Value types stored on heap, and only disposed when GC sees no references are made.
+
+### Generic types
+Generic types used for type safety, and reducing type generation.
+
+### Generic constraints
+------
+|**Constraint**|**Behaviour***|
+|`where T : class` | Type `T` must be reference|
+|`where T : struct` | Type `T` must be value type|
+|`where T : new()` | Type `T` must have public, parameterless constructor. Must be last|
+|`where T : <base> | Type `T` must be type of base, or derive from|
+|`where T : <interface> | Type `T` must be, or implement interface. Can be multiple|
+|`where T : unmanaged | Type `T` must not be reference type, or contain members that are unreferenced|
+------
+
+### Constructors
+Allows control of object creation process. Used on both ref, and class. Same name as object, but no return.
+Can perform validation of parameters, ensuring creation is valid. Exception must be thrown in this case.
+
+### Static Constructors
+
+Called once before very first instantiation, and never again. Good to use for initialising shared data
+
+### Static variables
+Not created for each instance, but for all members of that class.
+
+### Methods
+Signature and Body. Signature defines inputs, and output. Body is the code that executes, with each requiring a valid return.
+
+### Classes
+Templates. `new` creates from this template. Sequence:
+1. Code that implements class loaded into memory.
+2. First reference, all static members initialised, and static constructor called.
+3. Constructor is called.
+
+### Extension methods
+Can add behaviour without directly extending class. First parameter is the extending type. Always declared in static class, and static itself.
+Once created, can be used from the namespace which declares it, and then generates a call when used.
+
+Never a part of the object they are attached to. Can never replace existing method.
+
+### Optional and Named parameters
+Signatures give name and type of each parameter. Calls must always match this. Names can be used to reorder.
+Sometimes sensible default exists, but can be messy to duplicate. Use optional parameters.
+`static int myMethod(string required, string optional = "")`
+
+### Indexed properties
+Can access paticular element using index value.
+`array[0] = 99`
+
+Class can use same mechanism to provide indexed values.
+
+```c#
+public int this[int i]
+{
+	get {return array[i]; }
+}
+```
+
+Other types can be used for indexed properties. See `Dictionary<TKey, TValue>`
+
+### Create overload and overriden methods
+*Overload* vs *Overriden*
+
+Overload: method with same name, but different signature. Several ways of performing paticular behaviour.
+Override: method with same name, and same signature. Only `virtual` methods can be overriden.
+
+Allows for customising behaviour
